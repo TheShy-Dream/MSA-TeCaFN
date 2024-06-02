@@ -359,3 +359,110 @@ class MOSEI:
         else:
             print("Mode is not set properly (train/dev/test)")
             exit()
+
+class UR_FUNNY:
+    def __init__(self, config):
+        if config.sdk_dir is None:
+            print("SDK path is not specified! Please specify first in constants/paths.py")
+            exit(0)
+        else:
+            sys.path.append(str(config.sdk_dir))
+
+        DATA_PATH = str(config.dataset_dir)
+        CACHE_PATH = DATA_PATH + '/embedding_and_mapping.pt'
+
+        try:
+            self.train = load_pickle(DATA_PATH + '/train.pkl')
+            self.dev = load_pickle(DATA_PATH + '/dev.pkl')
+            self.test = load_pickle(DATA_PATH + '/test.pkl')
+            self.pretrained_emb, self.word2id = None, None
+
+        except:
+            if not os.path.exists(DATA_PATH):
+                check_call(' '.join(['mkdir', '-p', DATA_PATH]), shell=True)
+
+            data_folds = load_pickle(DATA_PATH + '/data_folds.pkl')
+            train_split = data_folds['train']
+            dev_split = data_folds['dev']
+            test_split = data_folds['test']
+            word_aligned_openface_sdk = load_pickle(DATA_PATH + "/openface_features_sdk.pkl")
+            word_aligned_covarep_sdk = load_pickle(DATA_PATH + "/covarep_features_sdk.pkl")
+            word_embedding_idx_sdk = load_pickle(DATA_PATH + "/language_sdk.pkl")
+            word_list_sdk = load_pickle(DATA_PATH + "/word_embedding_list.pkl")
+            humor_label_sdk = load_pickle(DATA_PATH + '/humor_label_sdk.pkl')
+
+            # a sentinel epsilon for safe division, without it we will replace illegal values with a constant
+            EPS = 1e-6
+
+            # place holders for the final train/dev/test dataset
+            self.train = train = []
+            self.dev = dev = []
+            self.test = test = []
+            self.word2id = word2id
+
+            num_drop = 0  # a counter to count how many data points went into some processing issues
+
+            for key in humor_label_sdk.keys():
+                label = np.array(humor_label_sdk[key], dtype=int)
+                _word_id = np.array(word_embedding_idx_sdk[key]['punchline_embedding_indexes'])
+                _acoustic = np.array(word_aligned_covarep_sdk[key]['punchline_features'])
+                _visual = np.array(word_aligned_openface_sdk[key]['punchline_features'])
+
+                if not _word_id.shape[0] == _acoustic.shape[0] == _visual.shape[0]:
+                    num_drop += 1
+                    continue
+
+                # remove nan values
+                label = np.array([np.nan_to_num(label)])[:, np.newaxis]
+                _visual = np.nan_to_num(_visual)
+                _acoustic = np.nan_to_num(_acoustic)
+
+                actual_words = []
+                words = []
+                visual = []
+                acoustic = []
+                for i, word in enumerate(_word_id):
+                    words.append(word)
+                    visual.append(_visual[i, :])
+                    acoustic.append(_acoustic[i, :])
+
+                words = np.asarray(words)
+                visual = np.asarray(visual)
+                acoustic = np.asarray(acoustic)
+                actual_words=np.array(word_embedding_idx_sdk[key]["punchline_features"])
+
+                visual = np.nan_to_num(
+                    (visual - visual.mean(0, keepdims=True)) / (EPS + np.std(visual, axis=0, keepdims=True)))
+                acoustic = np.nan_to_num(
+                    (acoustic - acoustic.mean(0, keepdims=True)) / (EPS + np.std(acoustic, axis=0, keepdims=True)))
+
+                if key in train_split:
+                    train.append(((words, visual, acoustic,actual_words,len(visual),len(acoustic)), label, key))
+                elif key in dev_split:
+                    dev.append(((words, visual, acoustic,actual_words,len(visual),len(acoustic)), label, key))
+                elif key in test_split:
+                    test.append(((words, visual, acoustic,actual_words,len(visual),len(acoustic)), label, key))#test.append(((words, visual, acoustic, actual_words, _vlen, _alen), _label, idd))
+                else:
+                    print(f"Found video that doesn't belong to any splits: {key}")
+
+
+            to_pickle(train, DATA_PATH + '/train.pkl')
+            to_pickle(dev, DATA_PATH + '/dev.pkl')
+            to_pickle(test, DATA_PATH + '/test.pkl')
+
+            print(f"# of Train {len(train)}")
+            print(f"# of dev {len(dev)}")
+            print(f"# of test {len(test)}")
+            print(f"Total number of {num_drop} datapoints have been dropped.")
+
+    def get_data(self, mode):
+
+        if mode == "train":
+            return self.train, self.word2id, None
+        elif mode == "valid":
+            return self.dev, self.word2id,None
+        elif mode == "test":
+            return self.test, self.word2id, None
+        else:
+            print("Mode is not set properly (train/dev/test)")
+            exit()

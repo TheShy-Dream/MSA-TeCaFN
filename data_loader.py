@@ -9,9 +9,9 @@ from torch.nn.utils.rnn import pad_sequence, pack_padded_sequence, pad_packed_se
 from torch.utils.data import DataLoader, Dataset
 from transformers import *
 
-from create_dataset import MOSI, MOSEI, PAD, UNK
+from create_dataset import MOSI, MOSEI, PAD, UNK,UR_FUNNY
 
-bert_tokenizer = BertTokenizer.from_pretrained('/home/amax/cjl/MMIM/bert-base-uncased/', do_lower_case=True)
+bert_tokenizer = BertTokenizer.from_pretrained('/home/cjl/code/cjl/MMIM/bert-base-uncased/', do_lower_case=True)
 
 
 class MSADataset(Dataset):
@@ -23,6 +23,8 @@ class MSADataset(Dataset):
             dataset = MOSI(config)
         elif "mosei" in str(config.data_dir).lower():
             dataset = MOSEI(config)
+        elif "ur_funny" in str(config.data_dir).lower():
+            dataset = UR_FUNNY(config)
         else:
             print("Dataset not defined correctly")
             exit()
@@ -128,7 +130,7 @@ def get_loader(hp, config, shuffle=True):
         ## BERT-based features input prep
 
         # SENT_LEN = min(sentences.size(0),50)
-        SENT_LEN = 50
+        SENT_LEN = 80
         # Create bert indices using tokenizer
 
         bert_details = []
