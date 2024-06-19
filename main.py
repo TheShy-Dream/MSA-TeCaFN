@@ -8,8 +8,6 @@ from torch.utils.data import DataLoader
 from solver import Solver
 from config import get_args, get_config, output_dim_dict, criterion_dict
 from data_loader import get_loader
-from nni.utils import merge_parameter
-import nni
 from easydict import EasyDict
 
 def set_seed(seed):
@@ -26,8 +24,6 @@ def set_seed(seed):
 
 if __name__ == '__main__':
     args = get_args()
-    tuner_params = nni.get_next_parameter()
-    args = vars(merge_parameter(get_args(), tuner_params))
     args=EasyDict(args)
     np.random.seed(int(args.np_seed))
     print(args)

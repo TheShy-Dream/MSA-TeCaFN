@@ -2,7 +2,6 @@ import numpy as np
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score, f1_score
-import nni
 
 def multiclass_acc(preds, truths):
     """
@@ -69,7 +68,6 @@ def eval_mosei_senti(results, truths, exclude_zero=False):
 
     print("-" * 50)
     to_exl = [mae, corr, mult_a7, acc1, acc2, f1_1, f1_2]
-    nni.report_intermediate_result({"default":np.round(acc_2, 4)*100,"mae":mae,"corr":corr,"acc_2_none0":np.round(acc_2_non0, 4)*100,"f1_1":np.round(f_score, 4)*100,"f1_2":np.round(f_score_non0, 4)*100,"mult_acc_7":mult_a7,"mult_acc_5":mult_a5})
     return {'mae': mae, 'corr': corr, 'mult': mult_a7, 'f1': f_score, 'acc2': acc_2, 'to_exl': to_exl}
 
 
@@ -146,5 +144,4 @@ def eval_humor(results, truths, exclude_zero=False):
     print(classification_report(test_truth, test_preds, digits=5))
     acc_2=accuracy_score(test_truth, test_preds)
     print("Accuracy (pos/neg) ", acc_2)
-    nni.report_intermediate_result({"default": np.round(acc_2, 4) * 100})
     return {'acc2': acc_2}
