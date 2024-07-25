@@ -129,8 +129,7 @@ def get_loader(hp, config, shuffle=True):
 
         ## BERT-based features input prep
 
-        # SENT_LEN = min(sentences.size(0),50)
-        SENT_LEN = 80
+        SENT_LEN = min(sentences.size(0),50)
         # Create bert indices using tokenizer
 
         bert_details = []
