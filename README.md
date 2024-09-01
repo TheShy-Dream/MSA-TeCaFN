@@ -9,7 +9,7 @@ You can download the CMU-MOSI and CMU-MOSEI datasets using [CMU-MultimodalDataSD
 You can download the UR-FUNNY dataset using [UR-FUNNY resp](https://github.com/ROC-HCI/UR-FUNNY). 
 
 
-## Environment Requirement
+## Environment Requirements
 
 python == 3.8.8
 
