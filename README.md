@@ -19,7 +19,7 @@ numpy == 1.20.0
 
 ## Citation
 
-If you use this code please cite it as:
+If you use this code please cite it as, thank you for your support.:
 
 ```
 @article{huang2024text,
