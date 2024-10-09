@@ -19,7 +19,7 @@ numpy == 1.20.0
 
 ## Citation
 
-If you use this code please cite it as, thank you for your support.:
+If you use this code please cite it as:
 
 ```
 @article{huang2024text,
@@ -33,4 +33,4 @@ If you use this code please cite it as, thank you for your support.:
   publisher={Springer}
 }
 ```
-**If you have any questions, feel free to post them in the [issues](https://github.com/TheShy-Dream/MSA-TeCaFN/issues) or contact us via [irelia@zjnu.edu.cn](mailto:irelia@zjnu.edu.cn).**
+**Thank you for your support. If you have any questions, feel free to post them in the [issues](https://github.com/TheShy-Dream/MSA-TeCaFN/issues) or contact us via [irelia@zjnu.edu.cn](mailto:irelia@zjnu.edu.cn).**
